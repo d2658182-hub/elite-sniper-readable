@@ -2,13 +2,19 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="authoring-tool" content="Adobe_Animate_CC - REFACTOR LISIBLE">
     <title>Elite Sniper - Version Lisible (Refactor)</title>
     <style>
+        html, body { width:100%; height:100%; overflow:hidden; background:#000; }
         #animation_container, #load_img, #load_txt {
             position: absolute; margin: auto; left:0; right:0; top:0; bottom:0;
         }
-        body { margin:0; background:#111; font-family:Arial,sans-serif; }
+        body { margin:0; background:#000; font-family:Arial,sans-serif; }
+        #container_background { background-color:#000 !important; }
+        #animation_container { background-color:#000 !important; }
+        canvas { background-color:#000 !important; }
         #info {
             position: absolute; top:10px; left:10px; color:#fff; background:rgba(0,0,0,0.7);
             padding:10px; font-size:12px; max-width:400px; z-index:100;
@@ -44,9 +50,9 @@
         <small>Canvas 1280x720 @62fps | Ouvrir console (F12) pour logs</small>
     </div>
 
-    <div id="container_background" tabindex="0" style="background:#ffffff; width:1280px; height:720px"></div>
-    <div id="animation_container" style="background:#ffffff; overflow:visible">
-        <canvas id="canvas" width="1280" height="720" style="position:absolute; display:none; background:#ffffff;"></canvas>
+    <div id="container_background" tabindex="0" style="background:#000; width:100vw; height:100vh"></div>
+    <div id="animation_container" style="background:#000; overflow:hidden">
+        <canvas id="canvas" width="1280" height="720" style="position:absolute; display:none; background:#000;"></canvas>
     </div>
     <div id="load_img" style="width:100px; height:100px;"><img src="./loading.png"></div>
     <div id="load_txt"><p></p></div>
@@ -99,10 +105,19 @@
             }
             function makeResponsive(isResp, respDim, isScale, scaleType){
                 var lastW,lastH,lastS=1;
-                window.addEventListener('resize', resizeCanvas); resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+                window.addEventListener('orientationchange', function(){ setTimeout(resizeCanvas, 300); });
+                window.addEventListener('resize', function(){
+                    if(window.exportRoot && window.exportRoot.landscape_mc){
+                        var isPortrait = window.innerHeight > window.innerWidth;
+                        window.exportRoot.landscape_mc.visible = isPortrait && window.__IS_MOBILE;
+                    }
+                });
+                resizeCanvas();
                 function resizeCanvas(){
                     var w=lib.properties.width, h=lib.properties.height;
-                    var iw=window.innerWidth, ih=window.innerHeight;
+                    var iw = (window.visualViewport && window.visualViewport.width) || window.innerWidth || document.documentElement.clientWidth,
+                        ih = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight;
                     var pRatio=window.devicePixelRatio||1, xRatio=iw/w, yRatio=ih/h, sRatio=1;
                     if(isResp){
                         if((respDim=='width'&&lastW==iw)||(respDim=='height'&&lastH==ih)) sRatio=lastS;
